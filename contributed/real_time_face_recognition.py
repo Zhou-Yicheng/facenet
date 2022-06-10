@@ -57,6 +57,10 @@ def main(args):
     frame_count = 0
 
     video_capture = cv2.VideoCapture(0)
+    if not video_capture.isOpened():
+        print("Cannot open camera")
+        return
+
     face_recognition = face.Recognition()
     start_time = time.time()
 
@@ -67,6 +71,9 @@ def main(args):
     while True:
         # Capture frame-by-frame
         ret, frame = video_capture.read()
+        if not ret:
+            print("Can't receive frame (stream end?). Exiting ...")
+            break
 
         if (frame_count % frame_interval) == 0:
             faces = face_recognition.identify(frame)

@@ -31,7 +31,6 @@ import os
 from subprocess import Popen, PIPE
 import tensorflow as tf
 import numpy as np
-from scipy import misc
 from sklearn.model_selection import KFold
 from scipy import interpolate
 from tensorflow.python.training import training
@@ -240,19 +239,19 @@ def to_rgb(img):
     ret[:, :, 0] = ret[:, :, 1] = ret[:, :, 2] = img
     return ret
   
-def load_data(image_paths, do_random_crop, do_random_flip, image_size, do_prewhiten=True):
-    nrof_samples = len(image_paths)
-    images = np.zeros((nrof_samples, image_size, image_size, 3))
-    for i in range(nrof_samples):
-        img = misc.imread(image_paths[i])
-        if img.ndim == 2:
-            img = to_rgb(img)
-        if do_prewhiten:
-            img = prewhiten(img)
-        img = crop(img, do_random_crop, image_size)
-        img = flip(img, do_random_flip)
-        images[i,:,:,:] = img
-    return images
+# def load_data(image_paths, do_random_crop, do_random_flip, image_size, do_prewhiten=True):
+#     nrof_samples = len(image_paths)
+#     images = np.zeros((nrof_samples, image_size, image_size, 3))
+#     for i in range(nrof_samples):
+#         img = misc.imread(image_paths[i])
+#         if img.ndim == 2:
+#             img = to_rgb(img)
+#         if do_prewhiten:
+#             img = prewhiten(img)
+#         img = crop(img, do_random_crop, image_size)
+#         img = flip(img, do_random_flip)
+#         images[i,:,:,:] = img
+#     return images
 
 def get_label_batch(label_data, batch_size, batch_index):
     nrof_examples = np.size(label_data, 0)
@@ -378,8 +377,8 @@ def load_model(model, input_map=None):
         print('Metagraph file: %s' % meta_file)
         print('Checkpoint file: %s' % ckpt_file)
       
-        saver = tf.train.import_meta_graph(os.path.join(model_exp, meta_file), input_map=input_map)
-        saver.restore(tf.get_default_session(), os.path.join(model_exp, ckpt_file))
+        saver = tf.compat.v1.train.import_meta_graph(os.path.join(model_exp, meta_file), input_map=input_map)
+        saver.restore(tf.compat.v1.get_default_session(), os.path.join(model_exp, ckpt_file))
     
 def get_model_filenames(model_dir):
     files = os.listdir(model_dir)
